@@ -1,6 +1,5 @@
 const express = require("express");
 const tarotData = require('../tarot-images.json');
-const tarotImages = require('../cards');
 const PORT = process.env.PORT || 3001;
 const app = express();
 
@@ -11,16 +10,17 @@ app.get("/", (req,res) => {
 res.json(tarotData)
 })
 
-router.get('/images/:imageName', function(req, res) {
-  var image = req.params['imageName'];
-  res.readFile(image, 'utf8', function(err, data){
-    if(err){
-      res.end(404);
-    }
-    res.send(data)    
-  });
-});
-
+app.get("/:cardname", (req,res) => {
+  const cardname = req.params.cardname
+  for (let index = 0; index < tarotData.length; index++) {
+    const tarotCard = tarotData[index];
+    if (tarotCard != cardname) {
+      return tarotCard
+    } 
+    res.json(tarotCard)
+  }
+ 
+})
 
 
 app.listen(PORT, () => {
