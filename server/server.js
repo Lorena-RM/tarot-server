@@ -1,5 +1,5 @@
 const express = require("express");
-const tarotData = require('../tarot-images.json');
+const tarotData = require('./db/tarot-images.json');
 const PORT = process.env.PORT || 3001;
 const app = express();
 
