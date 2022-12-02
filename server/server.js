@@ -1,48 +1,30 @@
 const express = require("express");
 const tarotData = require("./db/tarot-images.json");
-const tarot = require('./db/tarot')
+const { readFromFile } = require("./helpers/fsUtils");
+
 const PORT = process.env.PORT || 3001;
 const app = express();
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-// app.get("/", (req,res) => {
-// res.json(tarotData)
-// })
-
 app.get("/", (req, res) => {
-  tarot.getTarot().then((cards)=>{
-    return res.json(cards)
-  })
-  .catch((err) => res.status(500).json(err));
+  res.json(tarotData);
 });
 
-app.get("/:cardNumber", (req, res) => {
-  const cardname = req.params.cardNumber;
-  res.json(tarotData).then((tarotData) => {
-    for (let index = 0; index < tarotData.length; index++) {
-      const tarot = tarotData[index];
-      console.log(tarot);
-      // if (tarot = cardname) {
-      //   return tarot
-      // }
-      // res.json(tarot)
-    }
-  });
+app.get("/:id", (req, res) => {
+  const cardId = req.params.id;
+  const finalSentence = cardId.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase());
+    console.log(finalSentence)
+  readFromFile("./db/tarot-images.json")
+    .then((data) => JSON.parse(data))
+    .then((json) => {
+      const result = json.filter((card) => card.name === finalSentence);
+      return result.length > 0
+        ? res.json(result)
+        : res.json("No Card with that ID");
+    });
 });
-
-//I think we might have to add routes too the tarot keeper project im not completly sure how only one JSON would allow us to manipulate it into the actual project
-
-// app.get('/:id', (req, res) => {
-//   tarotData.findOne({
-//     where: {
-//       id: req.params.id,
-//     }
-//   })
-//     .then((data) => res.json(data))
-//     .catch((err) => res.status(400).json(err));
-// });
 
 app.listen(PORT, () => {
   console.log(`API server running on port ${PORT}!`);
